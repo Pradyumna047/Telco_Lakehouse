@@ -1,0 +1,63 @@
+resources:
+  jobs:
+    telco_setup:
+      name: telco_setup
+      description: Idempotent Unity Catalog setup. Run once per target before the daily job.
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "3"
+      tasks:
+        - task_key: setup_catalog
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/jobs/setup_catalog.py
+            parameters: ["--catalog", "${var.catalog}"]
+
+    telco_daily:
+      name: telco_daily
+      description: >
+        Simulates the nightly file drop, runs the lakehouse pipeline, re-applies
+        governed views and gates the run on data quality checks.
+      max_concurrent_runs: 1
+      timeout_seconds: 5400
+      schedule:
+        quartz_cron_expression: "0 30 5 * * ?"     # 05:30 every day
+        timezone_id: Europe/Berlin
+        pause_status: PAUSED                       # unpause in prod when ready
+      email_notifications:
+        on_failure: ["${var.notification_email}"]
+      parameters:
+        - name: batches
+          default: "1"
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "3"
+      tasks:
+        - task_key: land_source_files
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/jobs/generate_data.py
+            parameters: ["--catalog", "${var.catalog}", "--batches", "{{job.parameters.batches}}"]
+
+        - task_key: run_pipeline
+          depends_on: [{task_key: land_source_files}]
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.telco_lakehouse_pipeline.id}
+            full_refresh: false
+
+        - task_key: apply_governance
+          depends_on: [{task_key: run_pipeline}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/jobs/setup_catalog.py
+            parameters: ["--catalog", "${var.catalog}"]
+
+        - task_key: data_quality_gate
+          depends_on: [{task_key: run_pipeline}]
+          environment_key: default
+          max_retries: 0
+          spark_python_task:
+            python_file: ../src/jobs/dq_checks.py
+            parameters: ["--catalog", "${var.catalog}"]

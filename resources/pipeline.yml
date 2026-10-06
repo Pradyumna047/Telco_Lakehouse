@@ -1,0 +1,22 @@
+resources:
+  pipelines:
+    telco_lakehouse_pipeline:
+      name: telco_lakehouse_pipeline
+      catalog: ${var.catalog}
+      schema: ops                      # default schema; tables use fully qualified names
+      serverless: true
+      photon: true
+      channel: CURRENT
+      continuous: false                # triggered by the job, not always-on
+      development: false
+      libraries:
+        - file:
+            path: ../src/pipelines/bronze.py
+        - file:
+            path: ../src/pipelines/silver.py
+        - file:
+            path: ../src/pipelines/gold.py
+      configuration:
+        telco.catalog: ${var.catalog}
+        telco.landing_path: /Volumes/${var.catalog}/landing/raw
+        bundle.sourcePath: ${workspace.file_path}/src

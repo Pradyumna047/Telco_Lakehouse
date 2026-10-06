@@ -1,0 +1,32 @@
+bundle:
+  name: telco_lakehouse
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog that holds all schemas of this project.
+  notification_email:
+    description: Where job failure alerts go.
+    default: pradyumnashetty1998@gmail.com
+
+targets:
+  dev:
+    mode: development          # prefixes resources with [dev <user>], pauses schedules
+    default: true
+    workspace:
+      host: https://dbc-xxxxxxxx-xxxx.cloud.databricks.com   # your Free Edition workspace URL
+    variables:
+      catalog: telco_dev
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-xxxxxxxx-xxxx.cloud.databricks.com
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: telco_prod
+    # On a real team this would run as a service principal:
+    # run_as:
+    #   service_principal_name: <application-id>
