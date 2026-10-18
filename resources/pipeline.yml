@@ -8,7 +8,7 @@ resources:
       photon: true
       channel: CURRENT
       continuous: false                # triggered by the job, not always-on
-      development: false
+      #development: false
       libraries:
         - file:
             path: ../src/pipelines/bronze.py
