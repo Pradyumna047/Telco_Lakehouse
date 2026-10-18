@@ -16,14 +16,14 @@ targets:
     mode: development          # prefixes resources with [dev <user>], pauses schedules
     default: true
     workspace:
-      host: https://dbc-xxxxxxxx-xxxx.cloud.databricks.com   # your Free Edition workspace URL
+      host: https://dbc-73b429c4-5ae6.cloud.databricks.com #https://dbc-xxxxxxxx-xxxx.cloud.databricks.com   # your Free Edition workspace URL
     variables:
       catalog: telco_dev
 
   prod:
     mode: production
     workspace:
-      host: https://dbc-xxxxxxxx-xxxx.cloud.databricks.com
+      host: https://dbc-73b429c4-5ae6.cloud.databricks.com #https://dbc-xxxxxxxx-xxxx.cloud.databricks.com
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: telco_prod
