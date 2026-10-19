@@ -177,3 +177,4 @@ python tools/local_pipeline_run.py --batches 5 --customers 500
 - The code is tested locally (pytest plus the end-to-end local run). The bundle
   YAML is checked on the first deploy: field names such as `environment_version`
   change between CLI versions, so run `databricks bundle validate` first.
+- CI uses a personal access token with all-apis scope. In production this would be a service principal with only the scopes the deploy needs.
