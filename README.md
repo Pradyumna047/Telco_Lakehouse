@@ -163,7 +163,7 @@ python tools/local_pipeline_run.py --batches 5 --customers 500
 
 ## Known limits and things I would do differently with a budget
 
-- Free Edition has daily compute quotas. Keep `--initial-customers` around 2,000.
+- Free Edition of Databricks has daily compute quotas. Keep `--initial-customers` around 2,000.
 - `apply_changes` is used because it is widely documented; newer runtimes also
   offer `create_auto_cdc_flow` with the same arguments.
 - GDPR deletes close the SCD2 row but history keeps the old PII. A real
