@@ -10,7 +10,12 @@ import os
 import sys
 
 # make `telco` importable both in the workspace (bundle files) and locally
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+try:
+    _here = os.path.dirname(os.path.abspath(__file__))
+except NameError:  # serverless job tasks exec() the file without defining __file__
+    import inspect
+    _here = os.path.dirname(os.path.abspath(inspect.currentframe().f_code.co_filename))
+sys.path.insert(0, os.path.abspath(os.path.join(_here, "..")))
 
 from telco.generator import GeneratorConfig, generate_batch  # noqa: E402
 
